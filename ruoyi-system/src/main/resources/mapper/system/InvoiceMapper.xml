@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.InvoiceMapper">
+    
+    <resultMap type="Invoice" id="InvoiceResult">
+        <result property="invoiceId"    column="invoice_id"    />
+        <result property="employeeId"    column="employee_id"    />
+        <result property="employeeName"    column="employee_name"    />
+        <result property="department"    column="department"    />
+        <result property="bossName"    column="boss_name"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="unitPrice"    column="unit_price"    />
+        <result property="gift"    column="gift"    />
+        <result property="payment"    column="payment"    />
+        <result property="memberId"    column="member_id"    />
+        <result property="summoney"    column="summoney"    />
+        <result property="staus"    column="staus"    />
+        <result property="completionTime"    column="completion_time"    />
+        <result property="remarks"    column="remarks"    />
+    </resultMap>
+
+    <sql id="selectInvoiceVo">
+        select invoice_id, employee_id, employee_name, department, boss_name, quantity, unit_price, gift, payment, member_id, summoney, staus, completion_time, remarks from spark_invoice
+    </sql>
+
+    <select id="selectInvoiceList" parameterType="Invoice" resultMap="InvoiceResult">
+        <include refid="selectInvoiceVo"/>
+        <where>  
+            <if test="employeeName != null  and employeeName != ''"> and employee_name like concat('%', #{employeeName}, '%')</if>
+            <if test="department != null  and department != ''"> and department = #{department}</if>
+            <if test="bossName != null  and bossName != ''"> and boss_name like concat('%', #{bossName}, '%')</if>
+            <if test="payment != null  and payment != ''"> and payment = #{payment}</if>
+            <if test="staus != null "> and staus = #{staus}</if>
+            <if test="params.beginCompletionTime != null and params.beginCompletionTime != '' and params.endCompletionTime != null and params.endCompletionTime != ''"> and completion_time between #{params.beginCompletionTime} and #{params.endCompletionTime}</if>
+            <if test="remarks != null  and remarks != ''"> and remarks = #{remarks}</if>
+        </where>
+    </select>
+    
+    <select id="selectInvoiceByInvoiceId" parameterType="Long" resultMap="InvoiceResult">
+        <include refid="selectInvoiceVo"/>
+        where invoice_id = #{invoiceId}
+    </select>
+        
+    <insert id="insertInvoice" parameterType="Invoice">
+        insert into spark_invoice
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="invoiceId != null">invoice_id,</if>
+            <if test="employeeId != null">employee_id,</if>
+            <if test="employeeName != null">employee_name,</if>
+            <if test="department != null">department,</if>
+            <if test="bossName != null">boss_name,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="unitPrice != null">unit_price,</if>
+            <if test="gift != null">gift,</if>
+            <if test="payment != null">payment,</if>
+            <if test="memberId != null">member_id,</if>
+            <if test="summoney != null">summoney,</if>
+            <if test="staus != null">staus,</if>
+            <if test="completionTime != null">completion_time,</if>
+            <if test="remarks != null">remarks,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="invoiceId != null">#{invoiceId},</if>
+            <if test="employeeId != null">#{employeeId},</if>
+            <if test="employeeName != null">#{employeeName},</if>
+            <if test="department != null">#{department},</if>
+            <if test="bossName != null">#{bossName},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="unitPrice != null">#{unitPrice},</if>
+            <if test="gift != null">#{gift},</if>
+            <if test="payment != null">#{payment},</if>
+            <if test="memberId != null">#{memberId},</if>
+            <if test="summoney != null">#{summoney},</if>
+            <if test="staus != null">#{staus},</if>
+            <if test="completionTime != null">#{completionTime},</if>
+            <if test="remarks != null">#{remarks},</if>
+         </trim>
+    </insert>
+
+    <update id="updateInvoice" parameterType="Invoice">
+        update spark_invoice
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="employeeId != null">employee_id = #{employeeId},</if>
+            <if test="employeeName != null">employee_name = #{employeeName},</if>
+            <if test="department != null">department = #{department},</if>
+            <if test="bossName != null">boss_name = #{bossName},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="unitPrice != null">unit_price = #{unitPrice},</if>
+            <if test="gift != null">gift = #{gift},</if>
+            <if test="payment != null">payment = #{payment},</if>
+            <if test="memberId != null">member_id = #{memberId},</if>
+            <if test="summoney != null">summoney = #{summoney},</if>
+            <if test="staus != null">staus = #{staus},</if>
+            <if test="completionTime != null">completion_time = #{completionTime},</if>
+            <if test="remarks != null">remarks = #{remarks},</if>
+        </trim>
+        where invoice_id = #{invoiceId}
+    </update>
+
+    <delete id="deleteInvoiceByInvoiceId" parameterType="Long">
+        delete from spark_invoice where invoice_id = #{invoiceId}
+    </delete>
+
+    <delete id="deleteInvoiceByInvoiceIds" parameterType="String">
+        delete from spark_invoice where invoice_id in 
+        <foreach item="invoiceId" collection="array" open="(" separator="," close=")">
+            #{invoiceId}
+        </foreach>
+    </delete>
+</mapper>

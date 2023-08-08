@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.MemberMapper">
+    
+    <resultMap type="Member" id="MemberResult">
+        <result property="memberId"    column="member_id"    />
+        <result property="name"    column="name"    />
+        <result property="department"    column="department"    />
+        <result property="depositAmount"    column="deposit_amount"    />
+    </resultMap>
+
+    <sql id="selectMemberVo">
+        select member_id, name, department, deposit_amount from spark_member
+    </sql>
+
+    <select id="selectMemberList" parameterType="Member" resultMap="MemberResult">
+        <include refid="selectMemberVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="department != null  and department != ''"> and department = #{department}</if>
+            <if test="depositAmount != null "> and deposit_amount = #{depositAmount}</if>
+        </where>
+    </select>
+    
+    <select id="selectMemberByMemberId" parameterType="Long" resultMap="MemberResult">
+        <include refid="selectMemberVo"/>
+        where member_id = #{memberId}
+    </select>
+        
+    <insert id="insertMember" parameterType="Member">
+        insert into spark_member
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">member_id,</if>
+            <if test="name != null">name,</if>
+            <if test="department != null">department,</if>
+            <if test="depositAmount != null">deposit_amount,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="memberId != null">#{memberId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="department != null">#{department},</if>
+            <if test="depositAmount != null">#{depositAmount},</if>
+         </trim>
+    </insert>
+
+    <update id="updateMember" parameterType="Member">
+        update spark_member
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="department != null">department = #{department},</if>
+            <if test="depositAmount != null">deposit_amount = #{depositAmount},</if>
+        </trim>
+        where member_id = #{memberId}
+    </update>
+
+    <delete id="deleteMemberByMemberId" parameterType="Long">
+        delete from spark_member where member_id = #{memberId}
+    </delete>
+
+    <delete id="deleteMemberByMemberIds" parameterType="String">
+        delete from spark_member where member_id in 
+        <foreach item="memberId" collection="array" open="(" separator="," close=")">
+            #{memberId}
+        </foreach>
+    </delete>
+</mapper>

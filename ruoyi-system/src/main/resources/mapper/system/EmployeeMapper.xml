@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.EmployeeMapper">
+    
+    <resultMap type="Employee" id="EmployeeResult">
+        <result property="employeeId"    column="employee_id"    />
+        <result property="name"    column="name"    />
+        <result property="username"    column="username"    />
+        <result property="password"    column="password"    />
+        <result property="unitPrice"    column="unit_price"    />
+        <result property="wage"    column="wage"    />
+        <result property="employeeCategory"    column="employee_category"    />
+    </resultMap>
+
+    <sql id="selectEmployeeVo">
+        select employee_id, name, username, password, unit_price, wage, employee_category from spark_employee
+    </sql>
+
+    <select id="selectEmployeeList" parameterType="Employee" resultMap="EmployeeResult">
+        <include refid="selectEmployeeVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="employeeCategory != null  and employeeCategory != ''"> and employee_category = #{employeeCategory}</if>
+        </where>
+    </select>
+    
+    <select id="selectEmployeeByEmployeeId" parameterType="Long" resultMap="EmployeeResult">
+        <include refid="selectEmployeeVo"/>
+        where employee_id = #{employeeId}
+    </select>
+        
+    <insert id="insertEmployee" parameterType="Employee">
+        insert into spark_employee
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="employeeId != null">employee_id,</if>
+            <if test="name != null">name,</if>
+            <if test="username != null">username,</if>
+            <if test="password != null">password,</if>
+            <if test="unitPrice != null">unit_price,</if>
+            <if test="wage != null">wage,</if>
+            <if test="employeeCategory != null">employee_category,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="employeeId != null">#{employeeId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="username != null">#{username},</if>
+            <if test="password != null">#{password},</if>
+            <if test="unitPrice != null">#{unitPrice},</if>
+            <if test="wage != null">#{wage},</if>
+            <if test="employeeCategory != null">#{employeeCategory},</if>
+         </trim>
+    </insert>
+
+    <update id="updateEmployee" parameterType="Employee">
+        update spark_employee
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="username != null">username = #{username},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="unitPrice != null">unit_price = #{unitPrice},</if>
+            <if test="wage != null">wage = #{wage},</if>
+            <if test="employeeCategory != null">employee_category = #{employeeCategory},</if>
+        </trim>
+        where employee_id = #{employeeId}
+    </update>
+
+    <delete id="deleteEmployeeByEmployeeId" parameterType="Long">
+        delete from spark_employee where employee_id = #{employeeId}
+    </delete>
+
+    <delete id="deleteEmployeeByEmployeeIds" parameterType="String">
+        delete from spark_employee where employee_id in 
+        <foreach item="employeeId" collection="array" open="(" separator="," close=")">
+            #{employeeId}
+        </foreach>
+    </delete>
+</mapper>
